@@ -5,8 +5,14 @@ import Product from '../models/product.model.js';
 const app = express();
 app.use(express.json()); // allows us to accept JSON data in body
 
-app.get('/', (req, res) => {
-    res.send('Server is ready!');
+app.get('/api/products', async (req, res) => {
+    try {
+        const products = await Product.find({});
+        res.status(200).json({ success: true, data: products });
+    } catch (error) {
+        console.error('Error in fetching products: ', error.message);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
 app.post('/api/products', async (req, res) => {
@@ -33,6 +39,7 @@ app.delete('/api/products/:id', async (req, res) => {
         await Product.findByIdAndDelete(id);
         res.status(200).json({ sucess: true, message: 'Product deleted' });
     } catch (error) {
+        console.error('Error in deleting products: ', error.message);
         res.status(404).json({ success: false, message: 'Product not found' });
     }
 });
