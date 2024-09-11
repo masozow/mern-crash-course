@@ -1,6 +1,7 @@
 import express from 'express';
 import { connectDB } from './config/db.js';
 import Product from '../models/product.model.js';
+import mongoose from 'mongoose';
 
 const app = express();
 app.use(express.json()); // allows us to accept JSON data in body
@@ -29,6 +30,24 @@ app.post('/api/products', async (req, res) => {
         res.status(201).json({ success: true, data: newProduct });
     } catch (error) {
         console.error("Error in Create product: ", error.message);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+app.put('/api/products/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const product = req.body;
+    console.log(`ID: ${id} \nBODY:${JSON.stringify(product)}`);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ success: false, mesasge: 'Invalid product Id' });
+    }
+
+    try {
+        const updatedProduct = await Product.findByIdAndUpdate(id, product, { new: true });
+        console.log(`Updated product: \n${updatedProduct}`);
+        res.status(200).json({ success: true, data: updatedProduct });
+    } catch (error) {
         res.status(500).json({ success: false, message: "Server error" });
     }
 });
