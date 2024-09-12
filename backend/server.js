@@ -36,16 +36,14 @@ app.post('/api/products', async (req, res) => {
 
 app.put('/api/products/:id', async (req, res) => {
     const { id } = req.params;
-
     const product = req.body;
-    console.log(`ID: ${id} \nBODY:${JSON.stringify(product)}`);
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ success: false, mesasge: 'Invalid product Id' });
     }
 
     try {
         const updatedProduct = await Product.findByIdAndUpdate(id, product, { new: true });
-        console.log(`Updated product: \n${updatedProduct}`);
         res.status(200).json({ success: true, data: updatedProduct });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error" });
